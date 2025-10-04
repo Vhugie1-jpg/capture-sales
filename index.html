@@ -1,1 +1,360 @@
-Hello
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Form</title>
+</head>
+<body>
+      <p id="time" style="background:blue;"></p>
+    <button onclick="document.getElementById('time').innerHTML = Date();" >Day</button>
+    
+    <table border="1" id="myTable">
+        <thead>
+            <tr>
+                <th>Items</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select class="itemSelect" onchange="updatePrice(this)">
+                        <option value="Crate">Crate</option>
+                        <option value="Bucket">Bucket</option>
+                        <option value="Plastic">Plastic</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
+                </td>
+                <td>
+                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
+                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
+                        <option value="0">Select Price</option>
+                        <option value="60">R60</option>
+                        <option value="80">R80</option>
+                    </select>
+                </td>
+                <td><input type="text" class="total" readonly></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <td id="totalSum">0.00</td>
+            </tr>
+        </tfoot>
+    </table>
+    <button onclick="addRow()">Add Row</button>
+    <br><br>
+    
+    <table id="myTable2" border="1">
+        <thead>
+            <tr>
+                <th>Expenses</th>
+                <th>Total Exp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select class="expenseSelect" onchange="calculateExpenses()">
+                        <option value="Labor">Labor</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Stock">Stock</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Drawings">Drawings</option>
+                    </select>
+                </td>
+                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Total Expenses</td>
+                <td id="totalExpensesSum">0.00</td>
+            </tr>
+        </tfoot>
+    </table>
+    <button onclick="addRow1()">Add Row</button>
+    <br>
+    
+    <script>
+        function addRow() {
+            const table = document.getElementById('myTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <select class="itemSelect" onchange="updatePrice(this)">
+                        <option value="Crate">Crate</option>
+                        <option value="Bucket">Bucket</option>
+                        <option value="Plastic">Plastic</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
+                </td>
+                <td>
+                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
+                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
+                        <option value="0">Select Price</option>
+                        <option value="60">R60</option>
+                        <option value="80">R80</option>
+                    </select>
+                </td>
+                <td><input type="text" class="total" readonly></td>
+            `;
+        }
+
+        function addRow1() {
+            const table = document.getElementById('myTable2').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <select class="expenseSelect" onchange="calculateExpenses()">
+                        <option value="Labor">Labor</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Stock">Stock</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Drawings">Drawings</option>
+                    </select>
+                </td>
+                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
+            `;
+        }
+
+        function updatePrice(select) {
+            const row = select.closest('tr');
+            const priceInput = row.querySelector('.priceInput');
+            const priceSelect = row.querySelector('.priceSelect');
+
+            if (select.value === 'Crate') {
+                priceInput.style.display = 'none';
+                priceSelect.style.display = 'inline';
+                priceSelect.selectedIndex = 0; // Reset price selection
+            } else {
+                priceInput.style.display = 'inline';
+                priceSelect.style.display = 'none';
+                priceSelect.value = ''; // Clear price select
+            }
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const rows = document.querySelectorAll('#myTable tbody tr');
+            let totalSum = 0;
+            rows.forEach(row => {
+                const priceInput = row.querySelector('.priceInput');
+                const priceSelect = row.querySelector('.priceSelect');
+                const quantityInput = row.querySelector('.quantityInput');
+                const totalInput = row.querySelector('.total');
+                
+                const pricePerItem = priceSelect.style.display === 'inline' 
+                    ? parseFloat(priceSelect.value) || 0 
+                    : parseFloat(priceInput.value) || 0;
+                    
+                const quantity = parseFloat(quantityInput.value) || 0;
+
+                const total = pricePerItem * quantity; // Calculate total based on price and quantity
+                totalInput.value = total.toFixed(2);
+                totalSum += total;
+            });
+            document.getElementById('totalSum').textContent = totalSum.toFixed(2);
+        }
+
+        function calculateExpenses() {
+            const expenseInputs = document.querySelectorAll('#myTable2 input[type="number"]');
+            let totalExpenses = 0;
+            expenseInputs.forEach(input => {
+                totalExpenses += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalExpensesSum').textContent = totalExpenses.toFixed(2);
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Form</title>
+</head>
+<body>
+      <p id="time" style="background:blue;"></p>
+    <button onclick="document.getElementById('time').innerHTML = Date();" >Day</button>
+    
+    <table border="1" id="myTable">
+        <thead>
+            <tr>
+                <th>Items</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select class="itemSelect" onchange="updatePrice(this)">
+                        <option value="Crate">Crate</option>
+                        <option value="Bucket">Bucket</option>
+                        <option value="Plastic">Plastic</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
+                </td>
+                <td>
+                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
+                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
+                        <option value="0">Select Price</option>
+                        <option value="60">R60</option>
+                        <option value="80">R80</option>
+                    </select>
+                </td>
+                <td><input type="text" class="total" readonly></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <td id="totalSum">0.00</td>
+            </tr>
+        </tfoot>
+    </table>
+    <button onclick="addRow()">Add Row</button>
+    <br><br>
+    
+    <table id="myTable2" border="1">
+        <thead>
+            <tr>
+                <th>Expenses</th>
+                <th>Total Exp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select class="expenseSelect" onchange="calculateExpenses()">
+                        <option value="Labor">Labor</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Stock">Stock</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Drawings">Drawings</option>
+                    </select>
+                </td>
+                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Total Expenses</td>
+                <td id="totalExpensesSum">0.00</td>
+            </tr>
+        </tfoot>
+    </table>
+    <button onclick="addRow1()">Add Row</button>
+    <br>
+    
+    <script>
+        function addRow() {
+            const table = document.getElementById('myTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <select class="itemSelect" onchange="updatePrice(this)">
+                        <option value="Crate">Crate</option>
+                        <option value="Bucket">Bucket</option>
+                        <option value="Plastic">Plastic</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
+                </td>
+                <td>
+                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
+                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
+                        <option value="0">Select Price</option>
+                        <option value="60">R60</option>
+                        <option value="80">R80</option>
+                    </select>
+                </td>
+                <td><input type="text" class="total" readonly></td>
+            `;
+        }
+
+        function addRow1() {
+            const table = document.getElementById('myTable2').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <select class="expenseSelect" onchange="calculateExpenses()">
+                        <option value="Labor">Labor</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Stock">Stock</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Drawings">Drawings</option>
+                    </select>
+                </td>
+                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
+            `;
+        }
+
+        function updatePrice(select) {
+            const row = select.closest('tr');
+            const priceInput = row.querySelector('.priceInput');
+            const priceSelect = row.querySelector('.priceSelect');
+
+            if (select.value === 'Crate') {
+                priceInput.style.display = 'none';
+                priceSelect.style.display = 'inline';
+                priceSelect.selectedIndex = 0; // Reset price selection
+            } else {
+                priceInput.style.display = 'inline';
+                priceSelect.style.display = 'none';
+                priceSelect.value = ''; // Clear price select
+            }
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const rows = document.querySelectorAll('#myTable tbody tr');
+            let totalSum = 0;
+            rows.forEach(row => {
+                const priceInput = row.querySelector('.priceInput');
+                const priceSelect = row.querySelector('.priceSelect');
+                const quantityInput = row.querySelector('.quantityInput');
+                const totalInput = row.querySelector('.total');
+                
+                const pricePerItem = priceSelect.style.display === 'inline' 
+                    ? parseFloat(priceSelect.value) || 0 
+                    : parseFloat(priceInput.value) || 0;
+                    
+                const quantity = parseFloat(quantityInput.value) || 0;
+
+                const total = pricePerItem * quantity; // Calculate total based on price and quantity
+                totalInput.value = total.toFixed(2);
+                totalSum += total;
+            });
+            document.getElementById('totalSum').textContent = totalSum.toFixed(2);
+        }
+
+        function calculateExpenses() {
+            const expenseInputs = document.querySelectorAll('#myTable2 input[type="number"]');
+            let totalExpenses = 0;
+            expenseInputs.forEach(input => {
+                totalExpenses += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalExpensesSum').textContent = totalExpenses.toFixed(2);
+        }
+    </script>
+</body>
+</html>
