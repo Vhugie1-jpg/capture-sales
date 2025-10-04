@@ -1,360 +1,1364 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales & Expense Tracker</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --info-color: #009688;
+        }
+       
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+       
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+       
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+       
+        .tab-content {
+            display: none;
+            padding: 15px 0;
+            animation: fadeIn 0.5s;
+        }
+       
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+       
+        .active-tab {
+            display: block;
+        }
+       
+        .tab-button {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+       
+        .table-container {
+            overflow-x: auto;
+        }
+       
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+       
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+       
+        th {
+            background-color: #f2f2f2;
+        }
+       
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+       
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+       
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+       
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+       
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+       
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+       
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+       
+        .btn:hover {
+            opacity: 0.9;
+        }
+       
+        .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+       
+        .history-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+       
+        .history-date {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+       
+        .transaction-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            background-color: #f9f9f9;
+        }
+       
+        .sales-transaction {
+            border-left-color: var(--primary-color);
+        }
+       
+        .expense-transaction {
+            border-left-color: var(--danger-color);
+        }
+       
+        .transaction-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            margin-right: 10px;
+        }
+       
+        .type-sales {
+            background-color: var(--primary-color);
+        }
+       
+        .type-expense {
+            background-color: var(--danger-color);
+        }
+       
+        .transaction-details {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+       
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+       
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+       
+        .chart-container {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+       
+        .chart-title {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+       
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+       
+        .stat-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+       
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+       
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+       
+        .positive {
+            color: var(--primary-color);
+        }
+       
+        .negative {
+            color: var(--danger-color);
+        }
+       
+        .financial-statement {
+            background-color: white;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+       
+        .statement-section {
+            margin-bottom: 20px;
+        }
+       
+        .statement-header {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #eee;
+        }
+       
+        .statement-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+       
+        .statement-label {
+            flex: 2;
+        }
+       
+        .statement-value {
+            flex: 1;
+            text-align: right;
+            font-weight: bold;
+        }
+       
+        .statement-total {
+            font-weight: bold;
+            background-color: #f9f9f9;
+            border-top: 2px solid #ddd;
+        }
+       
+        .period-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+       
+        .period-btn {
+            padding: 8px 15px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+       
+        .period-btn.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+       
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
+            }
+           
+            .tab-button {
+                width: auto;
+                margin-bottom: 0;
+            }
+           
+            .action-buttons {
+                flex-wrap: nowrap;
+            }
+        }
+    </style>
 </head>
 <body>
-      <p id="time" style="background:blue;"></p>
-    <button onclick="document.getElementById('time').innerHTML = Date();" >Day</button>
-    
-    <table border="1" id="myTable">
-        <thead>
-            <tr>
-                <th>Items</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <select class="itemSelect" onchange="updatePrice(this)">
-                        <option value="Crate">Crate</option>
-                        <option value="Bucket">Bucket</option>
-                        <option value="Plastic">Plastic</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
-                </td>
-                <td>
-                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
-                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
-                        <option value="0">Select Price</option>
-                        <option value="60">R60</option>
-                        <option value="80">R80</option>
-                    </select>
-                </td>
-                <td><input type="text" class="total" readonly></td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td>Total</td>
-                <td></td>
-                <td></td>
-                <td id="totalSum">0.00</td>
-            </tr>
-        </tfoot>
-    </table>
-    <button onclick="addRow()">Add Row</button>
-    <br><br>
-    
-    <table id="myTable2" border="1">
-        <thead>
-            <tr>
-                <th>Expenses</th>
-                <th>Total Exp</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <select class="expenseSelect" onchange="calculateExpenses()">
-                        <option value="Labor">Labor</option>
-                        <option value="Electricity">Electricity</option>
-                        <option value="Stock">Stock</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Drawings">Drawings</option>
-                    </select>
-                </td>
-                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td>Total Expenses</td>
-                <td id="totalExpensesSum">0.00</td>
-            </tr>
-        </tfoot>
-    </table>
-    <button onclick="addRow1()">Add Row</button>
-    <br>
-    
-    <script>
-        function addRow() {
-            const table = document.getElementById('myTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            newRow.innerHTML = `
-                <td>
-                    <select class="itemSelect" onchange="updatePrice(this)">
-                        <option value="Crate">Crate</option>
-                        <option value="Bucket">Bucket</option>
-                        <option value="Plastic">Plastic</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
-                </td>
-                <td>
-                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
-                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
-                        <option value="0">Select Price</option>
-                        <option value="60">R60</option>
-                        <option value="80">R80</option>
-                    </select>
-                </td>
-                <td><input type="text" class="total" readonly></td>
-            `;
-        }
+    <div class="header">
+        <h1>Sales & Expense Tracker</h1>
+    </div>
+   
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="w3-bar w3-black">
+            <button class="w3-bar-item w3-button tab-button" onclick="openTab('invoices')">Invoices</button>
+            <button class="w3-bar-item w3-button tab-button" onclick="openTab('expenses')">Expenses</button>
+            <button class="w3-bar-item w3-button tab-button" onclick="openTab('history')">History</button>
+            <button class="w3-bar-item w3-button tab-button" onclick="openTab('reports')">Reports</button>
+            <button class="w3-bar-item w3-button tab-button" onclick="openTab('income-statement')">Income Statement</button>
+        </div>
+       
+        <!-- Invoice Tab -->
+        <div id="invoices" class="tab-content active-tab">
+            <h2>Invoice Management</h2>
+           
+            <div class="w3-panel w3-light-grey">
+                <label for="invoice-date">Invoice Date:</label>
+                <input type="date" id="invoice-date" class="w3-input w3-border">
+            </div>
+           
+            <div class="table-container">
+                <table id="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Notes</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoice-items">
+                        <!-- Invoice rows will be added here -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="4">Total Sales</td>
+                            <td id="total-sales">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+           
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="addInvoiceRow()">Add Item</button>
+                <button class="btn btn-primary" onclick="saveInvoice()">Save Invoice</button>
+                <button class="btn btn-warning" onclick="generateDummyInvoices()">Add Sample Data</button>
+            </div>
+        </div>
+       
+        <!-- Expense Tab -->
+        <div id="expenses" class="tab-content">
+            <h2>Expense Management</h2>
+           
+            <div class="w3-panel w3-light-grey">
+                <label for="expense-date">Expense Date:</label>
+                <input type="date" id="expense-date" class="w3-input w3-border">
+            </div>
+           
+            <div class="table-container">
+                <table id="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Expense Type</th>
+                            <th>Amount</th>
+                            <th>Notes</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expense-items">
+                        <!-- Expense rows will be added here -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2">Total Expenses</td>
+                            <td id="total-expenses">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+           
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="addExpenseRow()">Add Expense</button>
+                <button class="btn btn-primary" onclick="saveExpense()">Save Expense</button>
+                <button class="btn btn-warning" onclick="generateDummyExpenses()">Add Sample Data</button>
+            </div>
+        </div>
+       
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <h2>Transaction History</h2>
+           
+            <div class="action-buttons">
+                <button class="btn btn-danger" onclick="clearHistory()">Clear All History</button>
+            </div>
+           
+            <div id="history-content">
+                <!-- History items will be added here -->
+            </div>
+        </div>
+       
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <h2>Financial Reports</h2>
+           
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Sales</div>
+                    <div class="stat-value positive" id="total-sales-stat">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value negative" id="total-expenses-stat">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Net Profit</div>
+                    <div class="stat-value" id="net-profit-stat">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Profit Margin</div>
+                    <div class="stat-value" id="profit-margin-stat">0%</div>
+                </div>
+            </div>
+           
+            <div class="chart-container">
+                <h3 class="chart-title">Sales vs Expenses (Last 30 Days)</h3>
+                <canvas id="salesExpensesChart"></canvas>
+            </div>
+           
+            <div class="chart-container">
+                <h3 class="chart-title">Sales by Product Category</h3>
+                <canvas id="salesByCategoryChart"></canvas>
+            </div>
+           
+            <div class="chart-container">
+                <h3 class="chart-title">Expenses by Type</h3>
+                <canvas id="expensesByTypeChart"></canvas>
+            </div>
+           
+            <div class="chart-container">
+                <h3 class="chart-title">Monthly Trend</h3>
+                <canvas id="monthlyTrendChart"></canvas>
+            </div>
+        </div>
+       
+        <!-- Income Statement Tab -->
+        <div id="income-statement" class="tab-content">
+            <h2>Income Statement</h2>
+           
+            <div class="action-buttons">
+                <button class="btn btn-info" onclick="generateFullDummyData()">Generate Full Sample Data</button>
+                <button class="btn btn-secondary" onclick="updateIncomeStatement()">Refresh Statement</button>
+            </div>
+           
+            <div class="period-selector">
+                <button class="period-btn active" onclick="setStatementPeriod('month')">This Month</button>
+                <button class="period-btn" onclick="setStatementPeriod('quarter')">This Quarter</button>
+                <button class="period-btn" onclick="setStatementPeriod('year')">This Year</button>
+                <button class="period-btn" onclick="setStatementPeriod('all')">All Time</button>
+            </div>
+           
+            <div class="financial-statement">
+                <div class="statement-header">Income Statement for <span id="statement-period">This Month</span></div>
+               
+                <div class="statement-section">
+                    <div class="statement-row">
+                        <div class="statement-label">Revenue</div>
+                        <div class="statement-value" id="revenue-total">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Product Sales</div>
+                        <div class="statement-value" id="product-revenue">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Service Revenue</div>
+                        <div class="statement-value" id="service-revenue">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Other Revenue</div>
+                        <div class="statement-value" id="other-revenue">$0.00</div>
+                    </div>
+                </div>
+               
+                <div class="statement-section">
+                    <div class="statement-row statement-total">
+                        <div class="statement-label">Gross Profit</div>
+                        <div class="statement-value" id="gross-profit">$0.00</div>
+                    </div>
+                </div>
+               
+                <div class="statement-section">
+                    <div class="statement-row">
+                        <div class="statement-label">Operating Expenses</div>
+                        <div class="statement-value" id="total-expenses-is">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Salaries & Wages</div>
+                        <div class="statement-value" id="salary-expense">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Rent & Utilities</div>
+                        <div class="statement-value" id="rent-expense">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Marketing & Advertising</div>
+                        <div class="statement-value" id="marketing-expense">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Office Supplies</div>
+                        <div class="statement-value" id="supplies-expense">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Software & Subscriptions</div>
+                        <div class="statement-value" id="software-expense">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Travel & Entertainment</div>
+                        <div class="statement-value" id="travel-expense">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Other Expenses</div>
+                        <div class="statement-value" id="other-expense">$0.00</div>
+                    </div>
+                </div>
+               
+                <div class="statement-section">
+                    <div class="statement-row statement-total">
+                        <div class="statement-label">Operating Income</div>
+                        <div class="statement-value" id="operating-income">$0.00</div>
+                    </div>
+                </div>
+               
+                <div class="statement-section">
+                    <div class="statement-row">
+                        <div class="statement-label">Other Income/Expenses</div>
+                        <div class="statement-value" id="other-income">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Interest Income</div>
+                        <div class="statement-value" id="interest-income">$0.00</div>
+                    </div>
+                    <div class="statement-row">
+                        <div class="statement-label" style="padding-left: 20px;">Interest Expense</div>
+                        <div class="statement-value" id="interest-expense">$0.00</div>
+                    </div>
+                </div>
+               
+                <div class="statement-section">
+                    <div class="statement-row statement-total">
+                        <div class="statement-label">Net Income Before Tax</div>
+                        <div class="statement-value" id="net-income-before-tax">$0.00</div>
+                    </div>
+                </div>
+               
+                <div class="statement-section">
+                    <div class="statement-row">
+                        <div class="statement-label">Income Tax Expense</div>
+                        <div class="statement-value" id="tax-expense">$0.00</div>
+                    </div>
+                </div>
+               
+                <div class="statement-section">
+                    <div class="statement-row statement-total">
+                        <div class="statement-label">Net Income</div>
+                        <div class="statement-value" id="net-income">$0.00</div>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="chart-container">
+                <h3 class="chart-title">Profitability Analysis</h3>
+                <canvas id="profitabilityChart"></canvas>
+            </div>
+        </div>
+    </div>
 
-        function addRow1() {
-            const table = document.getElementById('myTable2').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            newRow.innerHTML = `
-                <td>
-                    <select class="expenseSelect" onchange="calculateExpenses()">
-                        <option value="Labor">Labor</option>
-                        <option value="Electricity">Electricity</option>
-                        <option value="Stock">Stock</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Drawings">Drawings</option>
-                    </select>
-                </td>
-                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
-            `;
-        }
-
-        function updatePrice(select) {
-            const row = select.closest('tr');
-            const priceInput = row.querySelector('.priceInput');
-            const priceSelect = row.querySelector('.priceSelect');
-
-            if (select.value === 'Crate') {
-                priceInput.style.display = 'none';
-                priceSelect.style.display = 'inline';
-                priceSelect.selectedIndex = 0; // Reset price selection
-            } else {
-                priceInput.style.display = 'inline';
-                priceSelect.style.display = 'none';
-                priceSelect.value = ''; // Clear price select
-            }
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            const rows = document.querySelectorAll('#myTable tbody tr');
-            let totalSum = 0;
-            rows.forEach(row => {
-                const priceInput = row.querySelector('.priceInput');
-                const priceSelect = row.querySelector('.priceSelect');
-                const quantityInput = row.querySelector('.quantityInput');
-                const totalInput = row.querySelector('.total');
-                
-                const pricePerItem = priceSelect.style.display === 'inline' 
-                    ? parseFloat(priceSelect.value) || 0 
-                    : parseFloat(priceInput.value) || 0;
-                    
-                const quantity = parseFloat(quantityInput.value) || 0;
-
-                const total = pricePerItem * quantity; // Calculate total based on price and quantity
-                totalInput.value = total.toFixed(2);
-                totalSum += total;
-            });
-            document.getElementById('totalSum').textContent = totalSum.toFixed(2);
-        }
-
-        function calculateExpenses() {
-            const expenseInputs = document.querySelectorAll('#myTable2 input[type="number"]');
-            let totalExpenses = 0;
-            expenseInputs.forEach(input => {
-                totalExpenses += parseFloat(input.value) || 0;
-            });
-            document.getElementById('totalExpensesSum').textContent = totalExpenses.toFixed(2);
-        }
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Form</title>
-</head>
-<body>
-      <p id="time" style="background:blue;"></p>
-    <button onclick="document.getElementById('time').innerHTML = Date();" >Day</button>
-    
-    <table border="1" id="myTable">
-        <thead>
-            <tr>
-                <th>Items</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <select class="itemSelect" onchange="updatePrice(this)">
-                        <option value="Crate">Crate</option>
-                        <option value="Bucket">Bucket</option>
-                        <option value="Plastic">Plastic</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
-                </td>
-                <td>
-                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
-                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
-                        <option value="0">Select Price</option>
-                        <option value="60">R60</option>
-                        <option value="80">R80</option>
-                    </select>
-                </td>
-                <td><input type="text" class="total" readonly></td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td>Total</td>
-                <td></td>
-                <td></td>
-                <td id="totalSum">0.00</td>
-            </tr>
-        </tfoot>
-    </table>
-    <button onclick="addRow()">Add Row</button>
-    <br><br>
-    
-    <table id="myTable2" border="1">
-        <thead>
-            <tr>
-                <th>Expenses</th>
-                <th>Total Exp</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <select class="expenseSelect" onchange="calculateExpenses()">
-                        <option value="Labor">Labor</option>
-                        <option value="Electricity">Electricity</option>
-                        <option value="Stock">Stock</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Drawings">Drawings</option>
-                    </select>
-                </td>
-                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td>Total Expenses</td>
-                <td id="totalExpensesSum">0.00</td>
-            </tr>
-        </tfoot>
-    </table>
-    <button onclick="addRow1()">Add Row</button>
-    <br>
-    
-    <script>
-        function addRow() {
-            const table = document.getElementById('myTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            newRow.innerHTML = `
-                <td>
-                    <select class="itemSelect" onchange="updatePrice(this)">
-                        <option value="Crate">Crate</option>
-                        <option value="Bucket">Bucket</option>
-                        <option value="Plastic">Plastic</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="quantityInput" oninput="calculateTotal()" min="1">
-                </td>
-                <td>
-                    <input type="number" class="priceInput" oninput="calculateTotal()" placeholder="Enter Price" style="display: inline;">
-                    <select class="priceSelect" onchange="calculateTotal()" style="display: none;">
-                        <option value="0">Select Price</option>
-                        <option value="60">R60</option>
-                        <option value="80">R80</option>
-                    </select>
-                </td>
-                <td><input type="text" class="total" readonly></td>
-            `;
-        }
-
-        function addRow1() {
-            const table = document.getElementById('myTable2').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            newRow.innerHTML = `
-                <td>
-                    <select class="expenseSelect" onchange="calculateExpenses()">
-                        <option value="Labor">Labor</option>
-                        <option value="Electricity">Electricity</option>
-                        <option value="Stock">Stock</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Drawings">Drawings</option>
-                    </select>
-                </td>
-                <td><input type="number" class="bugamt" oninput="calculateExpenses()"></td>
-            `;
-        }
-
-        function updatePrice(select) {
-            const row = select.closest('tr');
-            const priceInput = row.querySelector('.priceInput');
-            const priceSelect = row.querySelector('.priceSelect');
-
-            if (select.value === 'Crate') {
-                priceInput.style.display = 'none';
-                priceSelect.style.display = 'inline';
-                priceSelect.selectedIndex = 0; // Reset price selection
-            } else {
-                priceInput.style.display = 'inline';
-                priceSelect.style.display = 'none';
-                priceSelect.value = ''; // Clear price select
-            }
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            const rows = document.querySelectorAll('#myTable tbody tr');
-            let totalSum = 0;
-            rows.forEach(row => {
-                const priceInput = row.querySelector('.priceInput');
-                const priceSelect = row.querySelector('.priceSelect');
-                const quantityInput = row.querySelector('.quantityInput');
-                const totalInput = row.querySelector('.total');
-                
-                const pricePerItem = priceSelect.style.display === 'inline' 
-                    ? parseFloat(priceSelect.value) || 0 
-                    : parseFloat(priceInput.value) || 0;
-                    
-                const quantity = parseFloat(quantityInput.value) || 0;
-
-                const total = pricePerItem * quantity; // Calculate total based on price and quantity
-                totalInput.value = total.toFixed(2);
-                totalSum += total;
-            });
-            document.getElementById('totalSum').textContent = totalSum.toFixed(2);
-        }
-
-        function calculateExpenses() {
-            const expenseInputs = document.querySelectorAll('#myTable2 input[type="number"]');
-            let totalExpenses = 0;
-            expenseInputs.forEach(input => {
-                totalExpenses += parseFloat(input.value) || 0;
-            });
-            document.getElementById('totalExpensesSum').textContent = totalExpenses.toFixed(2);
-        }
-    </script>
+    <script>
+        // Item and expense type options
+        const itemOptions = [
+            { value: "product-a", label: "Product A", price: 25.00, category: "Products", revenueType: "product" },
+            { value: "product-b", label: "Product B", price: 35.50, category: "Products", revenueType: "product" },
+            { value: "product-c", label: "Product C", price: 42.75, category: "Products", revenueType: "product" },
+            { value: "service-a", label: "Service A", price: 60.00, category: "Services", revenueType: "service" },
+            { value: "service-b", label: "Service B", price: 85.00, category: "Services", revenueType: "service" },
+            { value: "consulting", label: "Consulting", price: 120.00, category: "Services", revenueType: "service" },
+            { value: "custom", label: "Custom Item", price: 0, category: "Other", revenueType: "other" }
+        ];
+       
+        const expenseOptions = [
+            { value: "supplies", label: "Office Supplies", category: "Operational", expenseType: "supplies" },
+            { value: "utilities", label: "Utilities", category: "Operational", expenseType: "rent" },
+            { value: "rent", label: "Rent", category: "Fixed", expenseType: "rent" },
+            { value: "marketing", label: "Marketing", category: "Marketing", expenseType: "marketing" },
+            { value: "travel", label: "Travel", category: "Operational", expenseType: "travel" },
+            { value: "salaries", label: "Salaries", category: "Personnel", expenseType: "salary" },
+            { value: "software", label: "Software", category: "Operational", expenseType: "software" },
+            { value: "other", label: "Other", category: "Miscellaneous", expenseType: "other" }
+        ];
+       
+        // Chart instances
+        let salesExpensesChart, salesByCategoryChart, expensesByTypeChart, monthlyTrendChart, profitabilityChart;
+       
+        // Current statement period
+        let currentStatementPeriod = 'month';
+       
+        // Tab management
+        function openTab(tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active-tab");
+            }
+           
+            document.getElementById(tabName).classList.add("active-tab");
+           
+            // Refresh data when opening history or reports tab
+            if (tabName === "history") {
+                loadHistory();
+            } else if (tabName === "reports") {
+                updateReports();
+            } else if (tabName === "income-statement") {
+                updateIncomeStatement();
+            }
+        }
+       
+        // Set statement period
+        function setStatementPeriod(period) {
+            currentStatementPeriod = period;
+           
+            // Update active button
+            const buttons = document.querySelectorAll('.period-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+           
+            // Update period label
+            const periodLabels = {
+                'month': 'This Month',
+                'quarter': 'This Quarter',
+                'year': 'This Year',
+                'all': 'All Time'
+            };
+            document.getElementById('statement-period').textContent = periodLabels[period];
+           
+            updateIncomeStatement();
+        }
+       
+        // Invoice management
+        function addInvoiceRow(item = "", quantity = 1, price = 0, notes = "") {
+            const tbody = document.getElementById("invoice-items");
+            const row = document.createElement("tr");
+            const rowId = Date.now() + Math.random();
+           
+            row.innerHTML = `
+                <td>
+                    <select class="item-select" onchange="updateItemPrice(this)">
+                        ${itemOptions.map(option =>
+                            `<option value="${option.value}" ${item === option.value ? 'selected' : ''}>${option.label}</option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td><input type="number" class="quantity" value="${quantity}" min="1" onchange="calculateRowTotal(this)" oninput="calculateRowTotal(this)"></td>
+                <td><input type="number" class="price" value="${price}" step="0.01" min="0" onchange="calculateRowTotal(this)" oninput="calculateRowTotal(this)"></td>
+                <td><input type="text" class="notes" value="${notes}"></td>
+                <td class="row-total">$0.00</td>
+                <td><button class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
+            `;
+           
+            tbody.appendChild(row);
+           
+            // Set initial price if item is selected
+            if (item) {
+                const selectedOption = itemOptions.find(opt => opt.value === item);
+                if (selectedOption) {
+                    row.querySelector('.price').value = selectedOption.price;
+                }
+            }
+           
+            calculateRowTotal(row.querySelector('.quantity'));
+            updateTotalSales();
+        }
+       
+        function updateItemPrice(select) {
+            const selectedOption = itemOptions.find(opt => opt.value === select.value);
+            if (selectedOption && selectedOption.value !== "custom") {
+                const row = select.closest('tr');
+                const priceInput = row.querySelector('.price');
+                priceInput.value = selectedOption.price;
+                calculateRowTotal(select);
+            }
+        }
+       
+        function calculateRowTotal(input) {
+            const row = input.closest('tr');
+            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const total = quantity * price;
+           
+            row.querySelector('.row-total').textContent = `$${total.toFixed(2)}`;
+            updateTotalSales();
+        }
+       
+        function updateTotalSales() {
+            const rows = document.querySelectorAll('#invoice-items tr');
+            let total = 0;
+           
+            rows.forEach(row => {
+                const rowTotal = parseFloat(row.querySelector('.row-total').textContent.replace('$', '')) || 0;
+                total += rowTotal;
+            });
+           
+            document.getElementById('total-sales').textContent = `$${total.toFixed(2)}`;
+        }
+       
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+            updateTotalSales();
+        }
+       
+        function saveInvoice() {
+            const date = document.getElementById('invoice-date').value;
+            if (!date) {
+                alert("Please select an invoice date");
+                return;
+            }
+           
+            const rows = document.querySelectorAll('#invoice-items tr');
+            if (rows.length === 0) {
+                alert("Please add at least one item to the invoice");
+                return;
+            }
+           
+            const items = [];
+            let totalAmount = 0;
+           
+            rows.forEach(row => {
+                const itemSelect = row.querySelector('.item-select');
+                const itemValue = itemSelect.value;
+                const itemLabel = itemSelect.options[itemSelect.selectedIndex].text;
+                const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                const notes = row.querySelector('.notes').value;
+                const total = quantity * price;
+               
+                items.push({
+                    item: itemValue,
+                    itemLabel: itemLabel,
+                    quantity: quantity,
+                    price: price,
+                    notes: notes,
+                    total: total
+                });
+               
+                totalAmount += total;
+            });
+           
+            const invoiceData = {
+                type: "sales",
+                transactionDate: date,
+                captureDate: new Date().toISOString(),
+                items: items,
+                totalAmount: totalAmount
+            };
+           
+            saveToHistory(invoiceData);
+            alert("Invoice saved successfully!");
+           
+            // Clear form
+            document.getElementById('invoice-items').innerHTML = '';
+            document.getElementById('invoice-date').value = '';
+            addInvoiceRow();
+            updateTotalSales();
+        }
+       
+        // Expense management
+        function addExpenseRow(expenseType = "", amount = 0, notes = "") {
+            const tbody = document.getElementById('expense-items');
+            const row = document.createElement('tr');
+           
+            row.innerHTML = `
+                <td>
+                    <select class="expense-type">
+                        ${expenseOptions.map(option =>
+                            `<option value="${option.value}" ${expenseType === option.value ? 'selected' : ''}>${option.label}</option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td><input type="number" class="amount" value="${amount}" step="0.01" min="0" onchange="updateTotalExpenses()" oninput="updateTotalExpenses()"></td>
+                <td><input type="text" class="notes" value="${notes}"></td>
+                <td><button class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
+            `;
+           
+            tbody.appendChild(row);
+            updateTotalExpenses();
+        }
+       
+        function updateTotalExpenses() {
+            const rows = document.querySelectorAll('#expense-items tr');
+            let total = 0;
+           
+            rows.forEach(row => {
+                const amount = parseFloat(row.querySelector('.amount').value) || 0;
+                total += amount;
+            });
+           
+            document.getElementById('total-expenses').textContent = `$${total.toFixed(2)}`;
+        }
+       
+        function saveExpense() {
+            const date = document.getElementById('expense-date').value;
+            if (!date) {
+                alert("Please select an expense date");
+                return;
+            }
+           
+            const rows = document.querySelectorAll('#expense-items tr');
+            if (rows.length === 0) {
+                alert("Please add at least one expense");
+                return;
+            }
+           
+            const expenses = [];
+            let totalAmount = 0;
+           
+            rows.forEach(row => {
+                const expenseSelect = row.querySelector('.expense-type');
+                const expenseValue = expenseSelect.value;
+                const expenseLabel = expenseSelect.options[expenseSelect.selectedIndex].text;
+                const amount = parseFloat(row.querySelector('.amount').value) || 0;
+                const notes = row.querySelector('.notes').value;
+               
+                expenses.push({
+                    expenseType: expenseValue,
+                    expenseLabel: expenseLabel,
+                    amount: amount,
+                    notes: notes
+                });
+               
+                totalAmount += amount;
+            });
+           
+            const expenseData = {
+                type: "expense",
+                transactionDate: date,
+                captureDate: new Date().toISOString(),
+                expenses: expenses,
+                totalAmount: totalAmount
+            };
+           
+            saveToHistory(expenseData);
+            alert("Expense saved successfully!");
+           
+            // Clear form
+            document.getElementById('expense-items').innerHTML = '';
+            document.getElementById('expense-date').value = '';
+            addExpenseRow();
+            updateTotalExpenses();
+        }
+       
+        // History management
+        function saveToHistory(data) {
+            // Get existing history or initialize empty object
+            const history = JSON.parse(localStorage.getItem('transactionHistory')) || {};
+           
+            // Create date key in format YYYY-MM-DD
+            const dateKey = data.transactionDate;
+           
+            // Initialize array for this date if it doesn't exist
+            if (!history[dateKey]) {
+                history[dateKey] = [];
+            }
+           
+            // Add the new transaction
+            history[dateKey].push(data);
+           
+            // Save back to localStorage
+            localStorage.setItem('transactionHistory', JSON.stringify(history));
+        }
+       
+        function loadHistory() {
+            const historyContent = document.getElementById('history-content');
+            const history = JSON.parse(localStorage.getItem('transactionHistory')) || {};
+           
+            // Clear current content
+            historyContent.innerHTML = '';
+           
+            // Get all dates and sort in descending order (newest first)
+            const dates = Object.keys(history).sort((a, b) => new Date(b) - new Date(a));
+           
+            if (dates.length === 0) {
+                historyContent.innerHTML = '<div class="empty-state">No transactions recorded yet</div>';
+                return;
+            }
+           
+            // Create history items for each date
+            dates.forEach(date => {
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'history-date';
+                dateDiv.textContent = formatDate(date);
+               
+                const transactionsDiv = document.createElement('div');
+               
+                // Sort transactions by capture date (newest first)
+                const transactions = history[date].sort((a, b) =>
+                    new Date(b.captureDate) - new Date(a.captureDate)
+                );
+               
+                transactions.forEach(transaction => {
+                    const transactionDiv = document.createElement('div');
+                    transactionDiv.className = `transaction-item ${transaction.type}-transaction`;
+                   
+                    const typeLabel = transaction.type === 'sales' ? 'Sales' : 'Expense';
+                    const typeClass = transaction.type === 'sales' ? 'type-sales' : 'type-expense';
+                   
+                    let details = '';
+                   
+                    if (transaction.type === 'sales') {
+                        details = `Items: ${transaction.items.length} | Total: $${transaction.totalAmount.toFixed(2)}`;
+                    } else {
+                        details = `Expenses: ${transaction.expenses.length} | Total: $${transaction.totalAmount.toFixed(2)}`;
+                    }
+                   
+                    transactionDiv.innerHTML = `
+                        <div>
+                            <span class="transaction-type ${typeClass}">${typeLabel}</span>
+                            <span>${formatDate(transaction.captureDate, true)}</span>
+                        </div>
+                        <div class="transaction-details">${details}</div>
+                    `;
+                   
+                    transactionsDiv.appendChild(transactionDiv);
+                });
+               
+                historyContent.appendChild(dateDiv);
+                historyContent.appendChild(transactionsDiv);
+            });
+        }
+       
+        function clearHistory() {
+            if (confirm("Are you sure you want to clear all transaction history? This action cannot be undone.")) {
+                localStorage.removeItem('transactionHistory');
+                loadHistory();
+                alert("History cleared successfully!");
+            }
+        }
+       
+        // Dummy data generation
+        function generateDummyInvoices() {
+            const today = new Date();
+            const dates = [];
+           
+            // Generate dates for the last 90 days
+            for (let i = 0; i < 90; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                dates.push(date.toISOString().split('T')[0]);
+            }
+           
+            // Create 40-60 dummy invoices
+            const invoiceCount = Math.floor(Math.random() * 21) + 40;
+           
+            for (let i = 0; i < invoiceCount; i++) {
+                const date = dates[Math.floor(Math.random() * dates.length)];
+                const itemCount = Math.floor(Math.random() * 4) + 1; // 1-4 items per invoice
+                const items = [];
+                let totalAmount = 0;
+               
+                for (let j = 0; j < itemCount; j++) {
+                    const item = itemOptions[Math.floor(Math.random() * (itemOptions.length - 1))]; // Exclude custom
+                    const quantity = Math.floor(Math.random() * 5) + 1;
+                    const total = quantity * item.price;
+                   
+                    items.push({
+                        item: item.value,
+                        itemLabel: item.label,
+                        quantity: quantity,
+                        price: item.price,
+                        notes: `Sample invoice item ${j+1}`,
+                        total: total
+                    });
+                   
+                    totalAmount += total;
+                }
+               
+                const invoiceData = {
+                    type: "sales",
+                    transactionDate: date,
+                    captureDate: new Date().toISOString(),
+                    items: items,
+                    totalAmount: totalAmount
+                };
+               
+                saveToHistory(invoiceData);
+            }
+           
+            alert(`Generated ${invoiceCount} sample invoices!`);
+            loadHistory();
+        }
+       
+        function generateDummyExpenses() {
+            const today = new Date();
+            const dates = [];
+           
+            // Generate dates for the last 90 days
+            for (let i = 0; i < 90; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                dates.push(date.toISOString().split('T')[0]);
+            }
+           
+            // Create 30-50 dummy expenses
+            const expenseCount = Math.floor(Math.random() * 21) + 30;
+           
+            for (let i = 0; i < expenseCount; i++) {
+                const date = dates[Math.floor(Math.random() * dates.length)];
+                const expenseCountPerDay = Math.floor(Math.random() * 3) + 1; // 1-3 expenses per day
+                const expenses = [];
+                let totalAmount = 0;
+               
+                for (let j = 0; j < expenseCountPerDay; j++) {
+                    const expense = expenseOptions[Math.floor(Math.random() * expenseOptions.length)];
+                    const amount = parseFloat((Math.random() * 200 + 10).toFixed(2)); // $10-$210
+                   
+                    expenses.push({
+                        expenseType: expense.value,
+                        expenseLabel: expense.label,
+                        amount: amount,
+                        notes: `Sample expense ${j+1}`
+                    });
+                   
+                    totalAmount += amount;
+                }
+               
+                const expenseData = {
+                    type: "expense",
+                    transactionDate: date,
+                    captureDate: new Date().toISOString(),
+                    expenses: expenses,
+                    totalAmount: totalAmount
+                };
+               
+                saveToHistory(expenseData);
+            }
+           
+            alert(`Generated ${expenseCount} sample expenses!`);
+            loadHistory();
+        }
+       
+        // Generate comprehensive dummy data for income statement
+        function generateFullDummyData() {
+            // Clear existing data first
+            localStorage.removeItem('transactionHistory');
+           
+            // Generate invoices and expenses
+            generateDummyInvoices();
+            generateDummyExpenses();
+           
+            // Add some additional financial transactions for a complete income statement
+            const today = new Date();
+            const history = JSON.parse(localStorage.getItem('transactionHistory')) || {};
+           
+            // Add some interest income
+            const interestDate = new Date();
+            interestDate.setDate(today.getDate() - 15);
+            const interestData = {
+                type: "other",
+                transactionDate: interestDate.toISOString().split('T')[0],
+                captureDate: new Date().toISOString(),
+                description: "Interest Income",
+                amount: 150.00,
+                category: "interest"
+            };
+           
+            saveToHistory(interestData);
+           
+            // Add tax expense
+            const taxDate = new Date();
+            taxDate.setDate(today.getDate() - 5);
+            const taxData = {
+                type: "tax",
+                transactionDate: taxDate.toISOString().split('T')[0],
+                captureDate: new Date().toISOString(),
+                description: "Income Tax",
+                amount: 850.00,
+                category: "tax"
+            };
+           
+            saveToHistory(taxData);
+           
+            alert("Full sample data generated with comprehensive financial records!");
+            loadHistory();
+            updateIncomeStatement();
+        }
+       
+        // Income Statement
+        function updateIncomeStatement() {
+            const history = JSON.parse(localStorage.getItem('transactionHistory')) || {};
+            const dates = Object.keys(history).sort();
+           
+            // Filter dates based on current period
+            const filteredDates = filterDatesByPeriod(dates, currentStatementPeriod);
+           
+            // Initialize income statement totals
+            let productRevenue = 0;
+            let serviceRevenue = 0;
+            let otherRevenue = 0;
+            let salaryExpense = 0;
+            let rentExpense = 0;
+            let marketingExpense = 0;
+            let suppliesExpense = 0;
+            let softwareExpense = 0;
+            let travelExpense = 0;
+            let otherExpense = 0;
+            let interestIncome = 0;
+            let interestExpense = 0;
+            let taxExpense = 0;
+           
+            // Process transactions for the selected period
+            filteredDates.forEach(date => {
+                const transactions = history[date];
+               
+                transactions.forEach(transaction => {
+                    if (transaction.type === 'sales') {
+                        // Categorize revenue
+                        transaction.items.forEach(item => {
+                            const itemData = itemOptions.find(opt => opt.value === item.item);
+                            const revenueType = itemData ? itemData.revenueType : 'other';
+                           
+                            if (revenueType === 'product') {
+                                productRevenue += item.total;
+                            } else if (revenueType === 'service') {
+                                serviceRevenue += item.total;
+                            } else {
+                                otherRevenue += item.total;
+                            }
+                        });
+                    } else if (transaction.type === 'expense') {
+                        // Categorize expenses
+                        transaction.expenses.forEach(expense => {
+                            const expenseData = expenseOptions.find(opt => opt.value === expense.expenseType);
+                            const expenseType = expenseData ? expenseData.expenseType : 'other';
+                           
+                            switch(expenseType) {
+                                case 'salary':
+                                    salaryExpense += expense.amount;
+                                    break;
+                                case 'rent':
+                                    rentExpense += expense.amount;
+                                    break;
+                                case 'marketing':
+                                    marketingExpense += expense.amount;
+                                    break;
+                                case 'supplies':
+                                    suppliesExpense += expense.amount;
+                                    break;
+                                case 'software':
+                                    softwareExpense += expense.amount;
+                                    break;
+                                case 'travel':
+                                    travelExpense += expense.amount;
+                                    break;
+                                default:
+                                    otherExpense += expense.amount;
+                            }
+                        });
+                    } else if (transaction.type === 'other') {
+                        // Other income/expenses
+                        if (transaction.category === 'interest') {
+                            interestIncome += transaction.amount;
+                        }
+                    } else if (transaction.type === 'tax') {
+                        taxExpense += transaction.amount;
+                    }
+                });
+            });
+           
+            // Calculate derived values
+            const totalRevenue = productRevenue + serviceRevenue + otherRevenue;
+            const totalOperatingExpenses = salaryExpense + rentExpense + marketingExpense +
+                                         suppliesExpense + softwareExpense + travelExpense + otherExpense;
+            const grossProfit = totalRevenue;
+            const operatingIncome = grossProfit - totalOperatingExpenses;
+            const netOtherIncome = interestIncome - interestExpense;
+            const netIncomeBeforeTax = operatingIncome + netOtherIncome;
+            const netIncome = netIncomeBeforeTax - taxExpense;
+           
+            // Update the income statement display
+            document.getElementById('revenue-total').textContent = `$${totalRevenue.toFixed(2)}`;
+            document.getElementById('product-revenue').textContent = `$${productRevenue.toFixed(2)}`;
+            document.getElementById('service-revenue').textContent = `$${serviceRevenue.toFixed(2)}`;
+            document.getElementById('other-revenue').textContent = `$${otherRevenue.toFixed(2)}`;
+            document.getElementById('gross-profit').textContent = `$${grossProfit.toFixed(2)}`;
+            document.getElementById('total-expenses-is').textContent = `$${totalOperatingExpenses.toFixed(2)}`;
+            document.getElementById('salary-expense').textContent = `$${salaryExpense.toFixed(2)}`;
+            document.getElementById('rent-expense').textContent = `$${rentExpense.toFixed(2)}`;
+            document.getElementById('marketing-expense').textContent = `$${marketingExpense.toFixed(2)}`;
+            document.getElementById('supplies-expense').textContent = `$${suppliesExpense.toFixed(2)}`;
+            document.getElementById('software-expense').textContent = `$${softwareExpense.toFixed(2)}`;
+            document.getElementById('travel-expense').textContent = `$${travelExpense.toFixed(2)}`;
+            document.getElementById('other-expense').textContent = `$${otherExpense.toFixed(2)}`;
+            document.getElementById('operating-income').textContent = `$${operatingIncome.toFixed(2)}`;
+            document.getElementById('other-income').textContent = `$${netOtherIncome.toFixed(2)}`;
+            document.getElementById('interest-income').textContent = `$${interestIncome.toFixed(2)}`;
+            document.getElementById('interest-expense').textContent = `$${interestExpense.toFixed(2)}`;
+            document.getElementById('net-income-before-tax').textContent = `$${netIncomeBeforeTax.toFixed(2)}`;
+            document.getElementById('tax-expense').textContent = `$${taxExpense.toFixed(2)}`;
+            document.getElementById('net-income').textContent = `$${netIncome.toFixed(2)}`;
+           
+            // Update profitability chart
+            updateProfitabilityChart(totalRevenue, totalOperatingExpenses, netIncome);
+        }
+       
+        function filterDatesByPeriod(dates, period) {
+            const today = new Date();
+            let startDate;
+           
+            switch(period) {
+                case 'month':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+                case 'quarter':
+                    const quarter = Math.floor(today.getMonth() / 3);
+                    startDate = new Date(today.getFullYear(), quarter * 3, 1);
+                    break;
+                case 'year':
+                    startDate = new Date(today.getFullYear(), 0, 1);
+                    break;
+                case 'all':
+                default:
+                    return dates; // Return all dates
+            }
+           
+            return dates.filter(date => new Date(date) >= startDate);
+        }
+       
+        function updateProfitabilityChart(revenue, expenses, netIncome) {
+            const ctx = document.getElementById('profitabilityChart').getContext('2d');
+           
+            if (profitabilityChart) {
+                profitabilityChart.destroy();
+            }
+           
+            profitabilityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Revenue', 'Expenses', 'Net Income'],
+                    datasets: [{
+                        label: 'Amount ($)',
+                        data: [revenue, expenses, netIncome],
+                        backgroundColor: [
+                            'rgba(76, 175, 80, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(33, 150, 243, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(76, 175, 80, 1)',
+                            'rgba(244, 67, 54, 1)',
+                            'rgba(33, 150, 243, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+       
+        // Reports and Charts (existing functions)
+        function updateReports() {
+            // ... (existing reports code from previous implementation)
+        }
+       
+        function formatDate(dateString, includeTime = false, short = false) {
+            const date = new Date(dateString);
+           
+            if (short) {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
+           
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+           
+            if (includeTime) {
+                options.hour = '2-digit';
+                options.minute = '2-digit';
+            }
+           
+            return date.toLocaleDateString('en-US', options);
+        }
+       
+        // Initialize the app
+        function initApp() {
+            // Set today's date as default for both forms
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('invoice-date').value = today;
+            document.getElementById('expense-date').value = today;
+           
+            // Add initial rows
+            addInvoiceRow();
+            addExpenseRow();
+           
+            // Load any existing history
+            loadHistory();
+           
+            // Check if we need to generate sample data
+            const history = JSON.parse(localStorage.getItem('transactionHistory')) || {};
+            if (Object.keys(history).length === 0) {
+                // No data exists, ask if user wants sample data
+                if (confirm("No transaction data found. Would you like to generate sample data to see how the app works?")) {
+                    generateFullDummyData();
+                }
+            } else {
+                updateIncomeStatement();
+            }
+        }
+       
+        // Initialize when page loads
+        window.onload = initApp;
+    </script>
 </body>
 </html>
