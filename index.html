@@ -694,7 +694,7 @@
                 <td><input type="number" class="quantity" value="${quantity}" min="1" onchange="calculateRowTotal(this)" oninput="calculateRowTotal(this)"></td>
                 <td><input type="number" class="price" value="${price}" step="0.01" min="0" onchange="calculateRowTotal(this)" oninput="calculateRowTotal(this)"></td>
                 <td><input type="text" class="notes" value="${notes}"></td>
-                <td class="row-total">$0.00</td>
+                <td class="row-total">R0.00</td>
                 <td><button class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
             `;
            
@@ -737,7 +737,7 @@
             let total = 0;
            
             rows.forEach(row => {
-                const rowTotal = parseFloat(row.querySelector('.row-total').textContent.replace('$', '')) || 0;
+                const rowTotal = parseFloat(row.querySelector('.row-total').textContent.replace('R' , '')) || 0;
                 total += rowTotal;
             });
            
@@ -1278,7 +1278,7 @@
                 data: {
                     labels: ['Revenue', 'Expenses', 'Net Income'],
                     datasets: [{
-                        label: 'Amount ($)',
+                        label: 'Amount (Rredo)',
                         data: [revenue, expenses, netIncome],
                         backgroundColor: [
                             'rgba(76, 175, 80, 0.7)',
@@ -1300,7 +1300,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return '$' + value;
+                                    return 'R' + value;
                                 }
                             }
                         }
