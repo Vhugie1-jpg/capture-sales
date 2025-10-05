@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Sales and Expense Tracker</title>
+</head>
+<body>
+    <div class="w3-container w3-margin">
+        <h1>Sales and Expense Tracker</h1>
+    </div>
+
+    <div class="w3-bar w3-border">
+        <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'invoice')">Invoices</button>
+        <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'expense')">Expenses</button>
+        <button class="w3-bar-item w3-button tablink" onclick="openTab(event, 'history')">History</button>
+    </div>
+
+    <div id="invoice" class="w3-container tab" style="display:none">
+        <h2>Invoice</h2>
+        <input type="date" id="invoiceDate" class="w3-input w3-border w3-margin-bottom" style="max-width:200px;">
+        <div class="w3-responsive">
+            <table id="invoiceTable" class="w3-table w3-striped w3-bordered">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Notes</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"><b>Total Sales</b></td>
+                        <td id="invoiceTotal">0.00</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <button class="w3-button w3-green w3-margin-top" onclick="addInvoiceRow()">Add Row</button>
+        <button class="w3-button w3-blue w3-margin-top" onclick="saveInvoice()">Save Invoice</button>
+    </div>
+
+    <div id="expense" class="w3-container tab" style="display:none">
+        <h2>Expenses</h2>
+        <input type="date" id="expenseDate" class="w3-input w3-border w3-margin-bottom" style="max-width:200px;">
+        <div class="w3-responsive">
+            <table id="expenseTable" class="w3-table w3-striped w3-bordered">
+                <thead>
+                    <tr>
+                        <th>Expense Type</th>
+                        <th>Amount</th>
+                        <th>Notes</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"><b>Total Expenses</b></td>
+                        <td id="expenseTotal">0.00</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <button class="w3-button w3-green w3-margin-top" onclick="addExpenseRow()">Add Row</button>
+        <button class="w3-button w3-blue w3-margin-top" onclick="saveExpense()">Save Expense</button>
+    </div>
+
+    <div id="history" class="w3-container tab" style="display:none">
+        <h2>History</h2>
+        <div id="historyContent"></div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" w3-light-grey", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " w3-light-grey";
+        }
+
+        const items = {
+            'Apple': {type: 'number', default: 1.5},
+            'Banana': {type: 'number', default: 0.5},
+            'Book': {type: 'dropdown', options: [
+                {label: 'Paperback - $10', value: 10},
+                {label: 'Hardcover - $20', value: 20}
+            ]},
+            'Custom': {type: 'number', default: 0}
+        };
+
+        const expenseTypes = ['Rent', 'Supplies', 'Travel', 'Other'];
+
+        function createItemSelect() {
+            let select = document.createElement('select');
+            select.className = 'w3-select w3-border';
+            for (let item in items) {
+                let option = document.createElement('option');
+                option.value = item;
+                option.text = item;
+                select.add(option);
+            }
+            return select;
+        }
+
+        function createPriceField(item) {
+            let config = items[item];
+            if (config.type === 'dropdown') {
+                let select = document.createElement('select');
+                select.className = 'w3-select w3-border';
+                config.options.forEach(opt => {
+                    let option = document.createElement('option');
+                    option.value = opt.value;
+                    option.text = opt.label;
+                    select.add(option);
+                });
+                return select;
+            } else {
+                let input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'w3-input w3-border';
+                input.value = config.default;
+                input.min = 0;
+                input.step = 0.01;
+                return input;
+            }
+        }
+
+        function addInvoiceRow(data = {}) {
+            let tbody = document.getElementById('invoiceTable').querySelector('tbody');
+            let tr = document.createElement('tr');
+
+            let tdItem = document.createElement('td');
+            let selectItem = createItemSelect();
+            selectItem.value = data.item || 'Apple';
+            tdItem.appendChild(selectItem);
+            tr.appendChild(tdItem);
+
+            let tdQty = document.createElement('td');
+            let inputQty = document.createElement('input');
+            inputQty.type = 'number';
+            inputQty.className = 'w3-input w3-border';
+            inputQty.value = data.qty || 1;
+            inputQty.min = 1;
+            tdQty.appendChild(inputQty);
+            tr.appendChild(tdQty);
+
+            let tdPrice = document.createElement('td');
+            let priceField = createPriceField(selectItem.value);
+            priceField.value = data.price || priceField.value;
+            tdPrice.appendChild(priceField);
+            tr.appendChild(tdPrice);
+
+            let tdNotes = document.createElement('td');
+            let inputNotes = document.createElement('input');
+            inputNotes.type = 'text';
+            inputNotes.className = 'w3-input w3-border';
+            inputNotes.value = data.notes || '';
+            tdNotes.appendChild(inputNotes);
+            tr.appendChild(tdNotes);
+
+            let tdTotal = document.createElement('td');
+            let spanTotal = document.createElement('span');
+            tdTotal.appendChild(spanTotal);
+            tr.appendChild(tdTotal);
+
+            let tdAction = document.createElement('td');
+            let btnRemove = document.createElement('button');
+            btnRemove.className = 'w3-button w3-red';
+            btnRemove.textContent = 'Remove';
+            btnRemove.onclick = () => { tr.remove(); updateInvoiceTotal(); saveCurrentInvoice(); };
+            tdAction.appendChild(btnRemove);
+            tr.appendChild(tdAction);
+
+            tbody.appendChild(tr);
+
+            selectItem.onchange = () => {
+                let newPriceField = createPriceField(selectItem.value);
+                tdPrice.innerHTML = '';
+                tdPrice.appendChild(newPriceField);
+                newPriceField.onchange = () => { updateRowTotal(tr); updateInvoiceTotal(); saveCurrentInvoice(); };
+                updateRowTotal(tr);
+                updateInvoiceTotal();
+                saveCurrentInvoice();
+            };
+            inputQty.onchange = () => { updateRowTotal(tr); updateInvoiceTotal(); saveCurrentInvoice(); };
+            priceField.onchange = () => { updateRowTotal(tr); updateInvoiceTotal(); saveCurrentInvoice(); };
+            inputNotes.onchange = saveCurrentInvoice;
+
+            updateRowTotal(tr);
+            updateInvoiceTotal();
+        }
+
+        function updateRowTotal(tr) {
+            let qty = parseFloat(tr.querySelector('td:nth-child(2) input').value) || 0;
+            let priceField = tr.querySelector('td:nth-child(3) > *');
+            let price = parseFloat(priceField.value) || 0;
+            tr.querySelector('td:nth-child(5) span').textContent = (qty * price).toFixed(2);
+        }
+
+        function updateInvoiceTotal() {
+            let total = 0;
+            document.querySelectorAll('#invoiceTable tbody tr').forEach(tr => {
+                total += parseFloat(tr.querySelector('td:nth-child(5) span').textContent) || 0;
+            });
+            document.getElementById('invoiceTotal').textContent = total.toFixed(2);
+        }
+
+        function createTypeSelect() {
+            let select = document.createElement('select');
+            select.className = 'w3-select w3-border';
+            expenseTypes.forEach(type => {
+                let option = document.createElement('option');
+                option.value = type;
+                option.text = type;
+                select.add(option);
+            });
+            return select;
+        }
+
+        function addExpenseRow(data = {}) {
+            let tbody = document.getElementById('expenseTable').querySelector('tbody');
+            let tr = document.createElement('tr');
+
+            let tdType = document.createElement('td');
+            let selectType = createTypeSelect();
+            selectType.value = data.type || expenseTypes[0];
+            tdType.appendChild(selectType);
+            tr.appendChild(tdType);
+
+            let tdAmount = document.createElement('td');
+            let inputAmount = document.createElement('input');
+            inputAmount.type = 'number';
+            inputAmount.className = 'w3-input w3-border';
+            inputAmount.value = data.amount || 0;
+            inputAmount.min = 0;
+            inputAmount.step = 0.01;
+            tdAmount.appendChild(inputAmount);
+            tr.appendChild(tdAmount);
+
+            let tdNotes = document.createElement('td');
+            let inputNotes = document.createElement('input');
+            inputNotes.type = 'text';
+            inputNotes.className = 'w3-input w3-border';
+            inputNotes.value = data.notes || '';
+            tdNotes.appendChild(inputNotes);
+            tr.appendChild(tdNotes);
+
+            let tdAction = document.createElement('td');
+            let btnRemove = document.createElement('button');
+            btnRemove.className = 'w3-button w3-red';
+            btnRemove.textContent = 'Remove';
+            btnRemove.onclick = () => { tr.remove(); updateExpenseTotal(); saveCurrentExpense(); };
+            tdAction.appendChild(btnRemove);
+            tr.appendChild(tdAction);
+
+            tbody.appendChild(tr);
+
+            selectType.onchange = saveCurrentExpense;
+            inputAmount.onchange = () => { updateExpenseTotal(); saveCurrentExpense(); };
+            inputNotes.onchange = saveCurrentExpense;
+
+            updateExpenseTotal();
+        }
+
+        function updateExpenseTotal() {
+            let total = 0;
+            document.querySelectorAll('#expenseTable tbody tr').forEach(tr => {
+                total += parseFloat(tr.querySelector('td:nth-child(2) input').value) || 0;
+            });
+            document.getElementById('expenseTotal').textContent = total.toFixed(2);
+        }
+
+        function saveCurrentInvoice() {
+            let data = {
+                date: document.getElementById('invoiceDate').value,
+                lines: []
+            };
+            document.querySelectorAll('#invoiceTable tbody tr').forEach(tr => {
+                let item = tr.querySelector('td:nth-child(1) select').value;
+                let qty = tr.querySelector('td:nth-child(2) input').value;
+                let priceField = tr.querySelector('td:nth-child(3) > *');
+                let price = priceField.value;
+                let notes = tr.querySelector('td:nth-child(4) input').value;
+                let total = tr.querySelector('td:nth-child(5) span').textContent;
+                data.lines.push({item, qty, price, notes, total});
+            });
+            localStorage.setItem('currentInvoice', JSON.stringify(data));
+        }
+
+        function saveCurrentExpense() {
+            let data = {
+                date: document.getElementById('expenseDate').value,
+                lines: []
+            };
+            document.querySelectorAll('#expenseTable tbody tr').forEach(tr => {
+                let type = tr.querySelector('td:nth-child(1) select').value;
+                let amount = tr.querySelector('td:nth-child(2) input').value;
+                let notes = tr.querySelector('td:nth-child(3) input').value;
+                data.lines.push({type, amount, notes});
+            });
+            localStorage.setItem('currentExpense', JSON.stringify(data));
+        }
+
+        function saveInvoice() {
+            let transDate = document.getElementById('invoiceDate').value || new Date().toISOString().split('T')[0];
+            let total = parseFloat(document.getElementById('invoiceTotal').textContent);
+            if (total === 0) {
+                alert('Please add at least one item with positive total.');
+                return;
+            }
+            let lines = [];
+            document.querySelectorAll('#invoiceTable tbody tr').forEach(tr => {
+                let item = tr.querySelector('td:nth-child(1) select').value;
+                let qty = parseFloat(tr.querySelector('td:nth-child(2) input').value) || 0;
+                let price = parseFloat(tr.querySelector('td:nth-child(3) > *').value) || 0;
+                let notes = tr.querySelector('td:nth-child(4) input').value;
+                lines.push({item, qty, price, notes, total: (qty * price).toFixed(2)});
+            });
+            let record = {
+                id: Date.now(),
+                type: 'sales',
+                transDate,
+                captureDate: new Date().toLocaleString(),
+                data: {lines, total: total.toFixed(2)}
+            };
+            saveToHistory(record, transDate);
+            document.getElementById('invoiceTable').querySelector('tbody').innerHTML = '';
+            document.getElementById('invoiceDate').value = '';
+            addInvoiceRow();
+            localStorage.removeItem('currentInvoice');
+            updateInvoiceTotal();
+            loadHistory();
+        }
+
+        function saveExpense() {
+            let transDate = document.getElementById('expenseDate').value || new Date().toISOString().split('T')[0];
+            let total = parseFloat(document.getElementById('expenseTotal').textContent);
+            if (total === 0) {
+                alert('Please add at least one expense with positive amount.');
+                return;
+            }
+            let lines = [];
+            document.querySelectorAll('#expenseTable tbody tr').forEach(tr => {
+                let type = tr.querySelector('td:nth-child(1) select').value;
+                let amount = parseFloat(tr.querySelector('td:nth-child(2) input').value) || 0;
+                let notes = tr.querySelector('td:nth-child(3) input').value;
+                lines.push({type, amount: amount.toFixed(2), notes});
+            });
+            let record = {
+                id: Date.now(),
+                type: 'expense',
+                transDate,
+                captureDate: new Date().toLocaleString(),
+                data: {lines, total: total.toFixed(2)}
+            };
+            saveToHistory(record, transDate);
+            document.getElementById('expenseTable').querySelector('tbody').innerHTML = '';
+            document.getElementById('expenseDate').value = '';
+            addExpenseRow();
+            localStorage.removeItem('currentExpense');
+            updateExpenseTotal();
+            loadHistory();
+        }
+
+        function saveToHistory(record, transDate) {
+            let key = transDate;
+            let history = JSON.parse(localStorage.getItem('history')) || {};
+            if (!history[key]) history[key] = [];
+            history[key].push(record);
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        function loadHistory() {
+            let history = JSON.parse(localStorage.getItem('history')) || {};
+            let keys = Object.keys(history).sort((a, b) => b.localeCompare(a));
+            let content = '';
+            let currentMonth = '';
+            keys.forEach(key => {
+                let month = key.slice(0, 7);
+                if (month !== currentMonth) {
+                    if (currentMonth) content += '</div>';
+                    content += `<h2>${month}</h2><div class="w3-container">`;
+                    currentMonth = month;
+                }
+                content += `<h3>${key}</h3>`;
+                history[key].forEach(rec => {
+                    content += `
+                        <div class="w3-panel w3-pale-${rec.type === 'sales' ? 'green' : 'red'} w3-leftbar w3-border-${rec.type === 'sales' ? 'green' : 'red'}">
+                            <p><b>Type:</b> ${rec.type}<br>
+                            <b>Transaction Date:</b> ${rec.transDate}<br>
+                            <b>Capture Date:</b> ${rec.captureDate}</p>
+                            <button class="w3-button w3-block w3-${rec.type === 'sales' ? 'green' : 'red'}" onclick="toggleDetails(${rec.id})">View Details</button>
+                            <div id="details${rec.id}" style="display:none;">
+                    `;
+                    if (rec.type === 'sales') {
+                        content += '<div class="w3-responsive"><table class="w3-table w3-striped w3-bordered"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Notes</th><th>Total</th></tr></thead><tbody>';
+                        rec.data.lines.forEach(line => {
+                            content += `<tr><td>${line.item}</td><td>${line.qty}</td><td>${line.price}</td><td>${line.notes}</td><td>${line.total}</td></tr>`;
+                        });
+                        content += `</tbody><tfoot><tr><td colspan="4"><b>Total</b></td><td>${rec.data.total}</td></tr></tfoot></table></div>`;
+                    } else {
+                        content += '<div class="w3-responsive"><table class="w3-table w3-striped w3-bordered"><thead><tr><th>Type</th><th>Amount</th><th>Notes</th></tr></thead><tbody>';
+                        rec.data.lines.forEach(line => {
+                            content += `<tr><td>${line.type}</td><td>${line.amount}</td><td>${line.notes}</td></tr>`;
+                        });
+                        content += `</tbody><tfoot><tr><td colspan="2"><b>Total</b></td><td>${rec.data.total}</td></tr></tfoot></table></div>`;
+                    }
+                    content += '</div></div>';
+                });
+            });
+            if (currentMonth) content += '</div>';
+            document.getElementById('historyContent').innerHTML = content;
+        }
+
+        function toggleDetails(id) {
+            let div = document.getElementById('details' + id);
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        }
+
+        window.onload = function() {
+            document.getElementsByClassName('tablink')[0].click();
+            loadCurrentInvoice();
+            loadCurrentExpense();
+            loadHistory();
+            document.getElementById('invoiceDate').onchange = saveCurrentInvoice;
+            document.getElementById('expenseDate').onchange = saveCurrentExpense;
+        };
+
+        function loadCurrentInvoice() {
+            let saved = localStorage.getItem('currentInvoice');
+            if (saved) {
+                let data = JSON.parse(saved);
+                document.getElementById('invoiceDate').value = data.date || '';
+                if (data.lines.length > 0) {
+                    data.lines.forEach(line => addInvoiceRow(line));
+                } else {
+                    addInvoiceRow();
+                }
+            } else {
+                addInvoiceRow();
+            }
+        }
+
+        function loadCurrentExpense() {
+            let saved = localStorage.getItem('currentExpense');
+            if (saved) {
+                let data = JSON.parse(saved);
+                document.getElementById('expenseDate').value = data.date || '';
+                if (data.lines.length > 0) {
+                    data.lines.forEach(line => addExpenseRow(line));
+                } else {
+                    addExpenseRow();
+                }
+            } else {
+                addExpenseRow();
+            }
+        }
+    </script>
+</body>
+</html>
