@@ -1,0 +1,46 @@
+Create a mobile-friendly, single-file HTML app using W3.CSS that functions as a simple sales and expense tracker. Follow these exact specifications:
+
+1. Use **W3.CSS** for styling and responsive design (no external JS libraries).
+2. Organize the interface using **tabs**:
+   - One tab for **Invoices**
+   - One tab for **Expenses**
+   - One tab for **History** (read-only view)
+
+3. In the **Invoice tab**:
+   - Display a table for line items with columns:
+     - Item (dropdown)
+     - Quantity (number input)
+     - Price (number input or dropdown based on item type)
+     - Notes (free text per row)
+     - Total (auto-calculated)
+   - Show a **Total Sales** footer
+   - Allow adding/removing rows
+   - Include a **date input** for the transaction (user-supplied)
+   - Add a **"Save Invoice"** button to save the data
+
+4. In the **Expenses tab**:
+   - Similar table structure with:
+     - Expense type (dropdown)
+     - Amount (number input)
+     - Notes (free text per row)
+   - Include a **date input**
+   - Show total expenses
+   - Include **"Save Expense"** button
+
+5. In the **History tab**:
+   - Display saved transactions grouped by **month and day**
+   - Show both invoices and expenses, each tagged with:
+     - Type: `"sales"` or `"expense"`
+     - Transaction Date (user input)
+     - Capture Date (auto-generated)
+   - Optionally allow viewing details for each record
+
+6. Use **localStorage** to:
+   - Persist the latest entered invoice and expense data
+   - Store a separate daily **history** object grouped by year-month-day
+   - Tag each saved record with a `"type"` field (`sales`, `expense`, etc.)
+   - Include a `"captureDate"` field (auto timestamp)
+
+7. Keep everything in **one HTML file** (self-contained with inline CSS/JS).
+
+This app should support easy input, work on mobile devices, and provide persistent storage with simple navigation. It should be easy to expand later with features like credit notes, filtering, or exporting.
